@@ -1,0 +1,1 @@
+export { default as TextBase } from './TextBase';
