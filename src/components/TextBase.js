@@ -1,157 +1,85 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated, StyleSheet, Text, TextInput, TouchableOpacity,
+  StyleSheet, TextInput, Text, TouchableOpacity, View,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const styles = StyleSheet.create({
-  textInput: {
-    padding: 0,
-    paddingLeft: 7,
-    fontSize: 16,
-    flex: 1,
-  },
-  button: {
-    borderBottomWidth: 1,
-    margin: 1,
-    marginTop: 15,
+  container: {
+    height: 40,
     flexDirection: 'row',
+    borderWidth: 0.5,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  icons: {
+  input: {
+    flex: 1,
+    paddingHorizontal: 5,
+  },
+  iconPassword: {
     color: '#747272',
     fontSize: 27,
-    marginHorizontal: 2,
-  },
-  labelText: {
-    fontSize: 15,
-    lineHeight: 30,
-    color: '#000',
+    paddingHorizontal: 5,
   },
   textError: {
     color: '#ed2f2f',
-    fontSize: 11,
-    marginLeft: 3,
+    fontSize: 12,
+    marginLeft: 5,
   },
 });
 
-class TextBase extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFocused: false,
-      showPassword: false,
-      topAnim: new Animated.Value(3),
-      opacAnim: new Animated.Value(0.9),
-    };
-  }
+function TextBase(props) {
+  const ref = useRef(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setFocused] = useState(false);
 
-  componentDidMount() {
-    const { field: { value }, getRef } = this.props;
-
-    if (value) {
-      this.floatUp(-22);
-      this.setState({ isFocused: true });
+  useEffect(() => {
+    if (props.getRef) {
+      props.getRef(ref);
     }
-    if (getRef) {
-      getRef(this.inputRef);
-    }
-  }
+  });
 
-  floatBack(toValue) {
-    const { topAnim, opacAnim } = this.state;
-    const equalsValues = { duration: 150, useNativeDriver: false };
-    Animated.timing(topAnim, { toValue, ...equalsValues }).start();
-    Animated.timing(opacAnim, { toValue: 0.9, ...equalsValues }).start();
-  }
-
-  floatUp(toValue) {
-    const { topAnim, opacAnim } = this.state;
-    const equalsValues = { duration: 150, useNativeDriver: false };
-    Animated.timing(topAnim, { toValue, ...equalsValues }).start();
-    Animated.timing(opacAnim, { toValue: 0.6, ...equalsValues }).start();
-  }
-
-  renderLabel(label) {
-    const { field: { value } } = this.props;
-    const { isFocused } = this.state;
-    if (isFocused || value) {
-      this.floatUp(-22);
-    } else {
-      this.floatBack(3);
-    }
-    return label;
-  }
-
-  render() {
-    const {
-      field: {
-        name, value, onBlur, onChange,
-      },
-      form: { touched, errors, setFieldValue },
-      label,
-      secureTextEntry,
-      clearButton,
-      editable,
-      ...props
-    } = this.props;
-    const { topAnim, opacAnim, showPassword } = this.state;
-
-    const hasError = touched[name] && Boolean(errors[name]);
-    const borderColor = hasError ? '#ed2f2f' : '#D9D5DC';
-    const iconName = showPassword ? 'eye' : 'eye-off';
-
-    return (
-      <>
-        <TouchableOpacity style={[styles.button, { borderBottomColor: borderColor }]}>
-          <Animated.View style={{ position: 'absolute', top: topAnim, opacity: opacAnim }}>
-            <Text style={styles.labelText}>{this.renderLabel(label)}</Text>
-          </Animated.View>
-          <TextInput
-            name={name}
-            ref={(ref) => {
-              this.inputRef = ref;
-            }}
-            value={value}
-            onFocus={() => this.setState({ isFocused: true })}
-            style={styles.textInput}
-            onBlur={(event) => {
-              if (value) {
-                this.setState({ isFocused: true });
-              } else {
-                this.setState({ isFocused: false });
-              }
-              onBlur(name)(event);
-            }}
-            onChangeText={(event) => onChange(name)(event)}
-            autoCorrect={false}
-            secureTextEntry={secureTextEntry && !showPassword}
-            autoCompleteType="off"
-            autoCapitalize="none"
-            returnKeyType="next"
-            editable={editable}
-            {...props}
-          />
-          {secureTextEntry && (
-          <Icon
-            name={iconName}
-            style={styles.icons}
-            onPress={() => this.setState({ showPassword: !showPassword })}
-          />
-          )}
-          {Boolean(value) && editable && clearButton && (
-          <Icon
-            name="close-circle"
-            style={[styles.icons, { color: '#D1D1D1' }]}
-            onPress={() => setFieldValue(name, '')}
-          />
-          )}
-        </TouchableOpacity>
-        {hasError && <Text style={styles.textError}>{errors[name]}</Text>}
-      </>
-    );
-  }
+  const {
+    field: {
+      name, value, onChange, onBlur,
+    },
+    form: { touched, errors },
+    label,
+    secureTextEntry,
+    style,
+    ...otheProps
+  } = props;
+  const hasError = touched[name] && Boolean(errors[name]);
+  const borderColor = hasError ? 'red' : 'black';
+  return (
+    <View style={style}>
+      <TouchableOpacity style={[styles.container, { borderColor: isFocused ? 'blue' : borderColor }]}>
+        <TextInput
+          name={name}
+          onFocus={() => setFocused(true)}
+          ref={ref}
+          style={styles.input}
+          placeholder={label}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur(name)(event);
+          }}
+          onChangeText={(event) => onChange(name)(event)}
+          autoCorrect={false}
+          secureTextEntry={secureTextEntry && !showPassword}
+          autoCompleteType="off"
+          autoCapitalize="none"
+          value={`${value}`}
+          {...otheProps}
+        />
+        {secureTextEntry && (
+          <Icon onPress={() => setShowPassword(!showPassword)} name={showPassword ? 'eye' : 'eye-off'} style={styles.iconPassword} size={20} />
+        )}
+      </TouchableOpacity>
+      {hasError && <Text style={styles.textError}>{errors[name]}</Text>}
+    </View>
+  );
 }
 
 TextBase.propTypes = {
@@ -160,15 +88,13 @@ TextBase.propTypes = {
   label: PropTypes.string.isRequired,
   secureTextEntry: PropTypes.bool,
   getRef: PropTypes.func,
-  clearButton: PropTypes.bool,
-  editable: PropTypes.bool,
+  style: PropTypes.oneOfType([PropTypes.object]),
 };
 
 TextBase.defaultProps = {
   secureTextEntry: false,
   getRef: null,
-  clearButton: true,
-  editable: true,
+  style: {},
 };
 
 export default TextBase;

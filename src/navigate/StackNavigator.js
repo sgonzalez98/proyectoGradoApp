@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Importacion de componentes para la ruta
 import Login from 'pages/Login';
-// import DrawerNavigator from './DrawerNavigator';
+import TabNavigator from './TabNavigator';
 
 // Navegador Stack para el inicio de sesión y La aplicación
 function MyStack() {
@@ -16,11 +16,11 @@ function MyStack() {
         component={Login}
         options={options}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="Drawer"
-        component={DrawerNavigator}
+        component={TabNavigator}
         options={options}
-      /> */}
+      />
     </Stack.Navigator>
   );
 }
