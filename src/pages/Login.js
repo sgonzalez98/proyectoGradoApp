@@ -22,25 +22,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   cardTop: {
-    height: 0.6 * height,
-    backgroundColor: 'cyan',
-    borderBottomRightRadius: 75,
+    flex: 0.7,
+    backgroundColor: '#0A99FF',
+    borderBottomRightRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
   },
   image: {
-    height: 0.3 * height,
+    height: 0.2 * height,
     resizeMode: 'contain',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 15,
+    marginBottom: 15,
+    color: 'white',
   },
   cardBottom: {
     flex: 1,
     backgroundColor: 'white',
-    borderTopLeftRadius: 75,
+    borderTopLeftRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -52,12 +53,11 @@ export default function Login() {
   return (
     <View style={styles.container}>
       <View style={styles.cardTop}>
-
         <Image source={iconImage} style={styles.image} />
         <Text style={styles.title}>Control de Tratamientos Medicos</Text>
       </View>
       <View style={{ flex: 1 }}>
-        <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'cyan' }} />
+        <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#0A99FF' }} />
         <View style={styles.cardBottom}>
           <Formik
             initialValues={{ user: '', password: '' }}
@@ -84,7 +84,7 @@ export default function Login() {
                   iconName="sign-in-alt"
                   text="Iniciar Sesión"
                   onPress={handleSubmit}
-                  disabled={isSubmitting}
+                  // disabled={isSubmitting}
                   style={{ marginTop: 20 }}
                 />
               </View>

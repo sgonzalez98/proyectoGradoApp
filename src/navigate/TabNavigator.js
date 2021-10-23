@@ -1,26 +1,15 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import FirstPage from 'pages/firstPage';
+import Alertas from 'pages/Alertas';
 import SecondPage from 'pages/secondPage';
 import ThirdPage from 'pages/thirdPage';
-import FourthPage from 'pages/fourthPage';
+import Medicinas from 'pages/Medicinas';
 import FifthPage from 'pages/fifthPage';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Tab = createBottomTabNavigator();
-
-const shadowSyles = {
-  shadowColor: '#7F5DF0',
-  shadowOffset: {
-    width: 0,
-    height: 10,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.5,
-  elevation: 5,
-};
 
 const customTabButton = (children, onPress) => (
   <TouchableOpacity onPress={onPress} style={{ top: -30 }}>
@@ -28,8 +17,12 @@ const customTabButton = (children, onPress) => (
       width: 70,
       height: 70,
       borderRadius: 35,
-      backgroundColor: '#e32f45',
-      ...shadowSyles,
+      backgroundColor: '#0A99FF',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.34,
+      shadowRadius: 6.27,
+      elevation: 10,
     }}
     >
       {children}
@@ -38,34 +31,31 @@ const customTabButton = (children, onPress) => (
 );
 
 const customIcon = (iconName, text, focused) => (
-  <View style={{ alignItems: 'center', justifyContent: 'center', top: 10 }}>
-    <Icon name={iconName} style={{ fontSize: 25, color: focused ? '#e32f45' : '#748c94' }} />
-    <Text style={{ fontSize: 12, color: focused ? '#e32f45' : '#748c94' }}>{text}</Text>
+  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+    <Icon name={iconName} style={{ fontSize: 25, color: focused ? '#0A99FF' : '#748c94' }} />
+    <Text style={{ fontSize: 12, color: focused ? '#0A99FF' : '#748c94' }}>{text}</Text>
   </View>
 );
 
 function MyTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="First"
+      initialRouteName="Alertas"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 25,
-          left: 15,
-          right: 15,
           backgroundColor: '#ffffff',
-          borderRadius: 15,
-          height: 75,
-          ...shadowSyles,
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
+          height: 70,
         },
       }}
     >
       <Tab.Screen
-        name="First"
-        component={FirstPage}
+        name="Alertas"
+        component={Alertas}
         options={{ tabBarIcon: ({ focused }) => customIcon('bell', 'Alertas', focused) }}
       />
       <Tab.Screen
@@ -82,14 +72,14 @@ function MyTabs() {
         }}
       />
       <Tab.Screen
-        name="Fourth"
-        component={FourthPage}
-        options={{ tabBarIcon: ({ focused }) => customIcon('capsules', 'Inventario', focused) }}
+        name="Medicinas"
+        component={Medicinas}
+        options={{ tabBarIcon: ({ focused }) => customIcon('capsules', 'Medicinas', focused) }}
       />
       <Tab.Screen
         name="Fifth"
         component={FifthPage}
-        options={{ tabBarIcon: ({ focused }) => customIcon('cog', 'Configuración', focused) }}
+        options={{ tabBarIcon: ({ focused }) => customIcon('cog', 'Ajustes', focused) }}
       />
     </Tab.Navigator>
   );

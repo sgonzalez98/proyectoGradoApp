@@ -54,7 +54,7 @@ function TextBase(props) {
   const borderColor = hasError ? 'red' : 'black';
   return (
     <View style={style}>
-      <TouchableOpacity style={[styles.container, { borderColor: isFocused ? 'blue' : borderColor }]}>
+      <TouchableOpacity style={[styles.container, { borderColor: isFocused ? '#1a59b5' : borderColor }]}>
         <TextInput
           name={name}
           onFocus={() => setFocused(true)}

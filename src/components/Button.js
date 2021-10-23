@@ -9,17 +9,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    padding: 8,
+    padding: 5,
   },
   icon: {
-    fontSize: 25,
+    fontSize: 20,
     marginRight: 10,
   },
 });
 
 const colors = {
-  success: '#5cb85c',
-  warning: '#f0ad4e',
+  success: '#0A99FF',
+  warning: '#748c94',
+  danger: '#e94449',
   disabled: '#b5b5b5',
 };
 
