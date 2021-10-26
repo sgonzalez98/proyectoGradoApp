@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from 'navigate/StackNavigator';
 import { StatusBar } from 'react-native';
-import Toast from 'react-native-toast-message'
+import Toast from 'react-native-toast-message';
 
 function App() {
   return (

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { API_SERVER, API_VERSION } from 'react-native-dotenv';
+import { API_SERVER, API_VERSION } from '@env';
 import { endPoints } from 'constants';
 import StorageService from './StorageService';
 

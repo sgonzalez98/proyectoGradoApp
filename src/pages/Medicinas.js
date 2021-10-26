@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button, ConfirmModal, Modal, TextBase,
 } from 'components';
@@ -7,14 +7,14 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Field, Formik } from 'formik';
-// import { withToast } from 'providers';
+import { withApi, withToast } from 'providers';
+import * as Yup from 'yup';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
   },
   topcard: {
-    flex: 1,
     height: 100,
     backgroundColor: '#0A99FF',
     borderBottomRightRadius: 40,
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     paddingLeft: 15,
-    paddingTop: 0,
+    alignItems: 'flex-end',
   },
   card: {
     width: '100%',
@@ -65,6 +65,25 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'stretch',
   },
+  addButton: {
+    position: 'absolute',
+    top: -30,
+    right: 40,
+    backgroundColor: '#748c94',
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.00,
+    elevation: 24,
+  },
 });
 
 const imageAdress = 'https://png.pngtree.com/png-clipart/20200226/original/pngtree-medicines-red-medicine-drug-hospital-png-image_5320658.jpg';
@@ -81,7 +100,15 @@ const initialState = {
   showModalForm: false,
 };
 
-function Medicinas({ appSuccess }) {
+const validationSchema = Yup.object({
+  nombre: Yup.string().required('El nombre es requerido'),
+  existencia: Yup.number().required('La existencia es requerida'),
+});
+
+function Medicinas(props) {
+  useEffect(() => {
+    props.appInfo('Mensaje de prueba');
+  }, []);
   const [state, setState] = useState(initialState);
   return (
     <ScrollView style={styles.container}>
@@ -91,6 +118,12 @@ function Medicinas({ appSuccess }) {
       </View>
       <View style={{ ...StyleSheet.absoluteFillObject, ...styles.absotuleCard }} />
       <View style={styles.cards}>
+        <Button
+          type="warning"
+          text="Crear nueva medicina"
+          iconName="plus"
+          onPress={() => setState((prevState) => ({ ...prevState, showModalForm: true }))}
+        />
         {data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
             <Image source={{ uri: imageAdress }} style={styles.image} />
@@ -132,9 +165,10 @@ function Medicinas({ appSuccess }) {
       <Modal visible>
         <Text style={{ fontWeight: 'bold', margin: 5 }}>Creacion o actualizacion de medicinas</Text>
         <Formik
+          enableReinitialize
           initialValues={{ nombre: '', existencia: '' }}
-          // validationSchema={validationSchemaAlmacenamiento}
-          onSubmit={() => appSuccess('Que berraquera ome !!!')}
+          validationSchema={validationSchema}
+          onSubmit={() => {}}
         >
           {({ handleSubmit }) => (
             <View style={{ width: '100%' }}>
@@ -182,4 +216,4 @@ function Medicinas({ appSuccess }) {
   );
 }
 
-export default Medicinas;
+export default withToast(withApi(Medicinas));

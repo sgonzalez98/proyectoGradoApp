@@ -5,18 +5,18 @@ import Alertas from 'pages/Alertas';
 import SecondPage from 'pages/secondPage';
 import ThirdPage from 'pages/thirdPage';
 import Medicinas from 'pages/Medicinas';
-import FifthPage from 'pages/fifthPage';
+import Configuracion from 'pages/configuracion';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Tab = createBottomTabNavigator();
 
 const customTabButton = (children, onPress) => (
-  <TouchableOpacity onPress={onPress} style={{ top: -30 }}>
+  <TouchableOpacity onPress={onPress} style={{ top: -20 }}>
     <View style={{
-      width: 70,
-      height: 70,
-      borderRadius: 35,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
       backgroundColor: '#0A99FF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 5 },
@@ -45,11 +45,10 @@ function MyTabs() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          position: 'absolute',
           backgroundColor: '#ffffff',
           borderTopLeftRadius: 15,
           borderTopRightRadius: 15,
-          height: 70,
+          height: 60,
         },
       }}
     >
@@ -67,7 +66,7 @@ function MyTabs() {
         name="Third"
         component={ThirdPage}
         options={{
-          tabBarIcon: () => (<Icon name="plus" style={{ fontSize: 30, color: '#fff' }} />),
+          tabBarIcon: () => (<Icon name="calendar-alt" style={{ fontSize: 30, color: '#fff' }} />),
           tabBarButton: ({ children, onPress }) => customTabButton(children, onPress),
         }}
       />
@@ -78,7 +77,7 @@ function MyTabs() {
       />
       <Tab.Screen
         name="Fifth"
-        component={FifthPage}
+        component={Configuracion}
         options={{ tabBarIcon: ({ focused }) => customIcon('cog', 'Ajustes', focused) }}
       />
     </Tab.Navigator>
