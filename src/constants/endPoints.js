@@ -5,10 +5,8 @@ export default {
     token: 'token',
   },
   app: {
-    recepcion: {
-      base: 'app/recepciones',
-      initForm: 'app/recepciones/initformcomponent',
-      atributos: 'app/recepciones/atributos',
+    medicine: {
+      base: 'medicine',
     },
   },
 };

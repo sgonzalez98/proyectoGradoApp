@@ -1,43 +1,13 @@
 import React from 'react';
 import {
-  ScrollView,
-  StyleSheet, Text, View,
+  ScrollView, StyleSheet, Text, View,
 } from 'react-native';
+import { TopCard, Content } from 'components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-  },
-  topcard: {
-    flex: 1,
-    height: 100,
-    backgroundColor: '#0A99FF',
-    borderBottomRightRadius: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  absotuleCard: {
-    backgroundColor: '#0A99FF',
-    top: 100,
-    height: 50,
-  },
-  title: {
-    color: 'white',
-    fontSize: 26,
-    marginLeft: 10,
-  },
-  titleIcon: {
-    color: 'white',
-    fontSize: 30,
-    marginLeft: 20,
-  },
-  cards: {
-    borderTopLeftRadius: 40,
-    backgroundColor: 'white',
-    padding: 10,
-    paddingLeft: 15,
-    paddingTop: 0,
   },
   card: {
     width: '100%',
@@ -73,15 +43,11 @@ const data = [
   { label: '5:00 PM - Flumazenil', cantidad: 1 },
 ];
 
-function FirstPage() {
+function Alertas() {
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.topcard}>
-        <Icon name="bell" style={styles.titleIcon} />
-        <Text style={styles.title}>Alertas Medicas</Text>
-      </View>
-      <View style={{ ...StyleSheet.absoluteFillObject, ...styles.absotuleCard }} />
-      <View style={styles.cards}>
+      <TopCard title="Alertas Medicas" iconName="bell" />
+      <Content>
         {data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
             <View style={styles.cardTitle}>
@@ -94,9 +60,9 @@ function FirstPage() {
             </View>
           </View>
         ))}
-      </View>
+      </Content>
     </ScrollView>
   );
 }
 
-export default FirstPage;
+export default Alertas;

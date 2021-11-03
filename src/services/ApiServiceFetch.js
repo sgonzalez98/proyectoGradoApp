@@ -17,14 +17,14 @@ class ApiServiceFetch {
   async configOptions(bearer, method) {
     const headerApi = this.head_content;
 
-    if (bearer) {
-      const authorizationBearer = {
-        Authorization: `${BEARER_PREFIX} ${await StorageService.getValue(
-          'scaliaApp.access_token',
-        )}`,
-      };
-      Object.assign(headerApi, authorizationBearer);
-    }
+    // if (bearer) {
+    //   const authorizationBearer = {
+    //     Authorization: `${BEARER_PREFIX} ${await StorageService.getValue(
+    //       'scaliaApp.access_token',
+    //     )}`,
+    //   };
+    //   Object.assign(headerApi, authorizationBearer);
+    // }
 
     return {
       method,

@@ -1,47 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, ConfirmModal, Modal, TextBase,
+  Button, ConfirmModal, Modal, TextBase, TopCard, Content,
 } from 'components';
 import {
   Image, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Field, Formik } from 'formik';
 import { withApi, withToast } from 'providers';
 import * as Yup from 'yup';
+import { endPoints } from 'constants';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-  },
-  topcard: {
-    height: 100,
-    backgroundColor: '#0A99FF',
-    borderBottomRightRadius: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  absotuleCard: {
-    backgroundColor: '#0A99FF',
-    top: 100,
-    height: 50,
-  },
-  title: {
-    color: 'white',
-    fontSize: 26,
-    marginLeft: 10,
-  },
-  titleIcon: {
-    color: 'white',
-    fontSize: 30,
-    marginLeft: 20,
-  },
-  cards: {
-    borderTopLeftRadius: 40,
-    backgroundColor: 'white',
-    padding: 10,
-    paddingLeft: 15,
-    alignItems: 'flex-end',
   },
   card: {
     width: '100%',
@@ -88,16 +59,10 @@ const styles = StyleSheet.create({
 
 const imageAdress = 'https://png.pngtree.com/png-clipart/20200226/original/pngtree-medicines-red-medicine-drug-hospital-png-image_5320658.jpg';
 
-const data = [
-  { label: 'Acetaminofen', cantidad: 100 },
-  { label: 'Dolex Gripa', cantidad: 20 },
-  { label: 'Dolex', cantidad: 50 },
-  { label: 'Hierba Buena', cantidad: 70 },
-];
-
 const initialState = {
   showModalDelete: false,
   showModalForm: false,
+  data: [],
 };
 
 const validationSchema = Yup.object({
@@ -105,32 +70,67 @@ const validationSchema = Yup.object({
   existencia: Yup.number().required('La existencia es requerida'),
 });
 
-function Medicinas(props) {
-  useEffect(() => {
-    props.appInfo('Mensaje de prueba');
-  }, []);
+function Medicinas({
+  appError, navigation, doGet, doPost,
+}) {
+
   const [state, setState] = useState(initialState);
+
+  const loadData = async () => {
+    const url = `${endPoints.app.medicine.base}/user/1`;
+    const resp = await doGet({ url });
+    setState((prevState) => ({ ...prevState, data: resp }));
+  }
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      try {
+        loadData();
+      } catch (error) {
+        appError(error.message ? error.message : messages.crud.fail);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const create = async(values, subProps) => {
+    try {
+      const url = endPoints.app.medicine.base;
+      const data = {
+        name: values.nombre,
+        existence: values.existencia,
+        picture: imageAdress,
+        userId: 1,
+      };
+
+      await doPost({ url, data });
+      setState((prevState) => ({ ...prevState, showModalForm: false}));
+      loadData();
+    } catch (error) {
+      appError(error.message ? error.message : messages.crud.fail);
+    }
+  }
+
+
+
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.topcard}>
-        <Icon name="capsules" style={styles.titleIcon} />
-        <Text style={styles.title}>Inventario de medicinas</Text>
-      </View>
-      <View style={{ ...StyleSheet.absoluteFillObject, ...styles.absotuleCard }} />
-      <View style={styles.cards}>
+      <TopCard title="Inventario de medicinas" iconName="capsules" />
+      <Content>
         <Button
           type="warning"
           text="Crear nueva medicina"
           iconName="plus"
           onPress={() => setState((prevState) => ({ ...prevState, showModalForm: true }))}
         />
-        {data.map((row, i) => (
+        {state.data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
-            <Image source={{ uri: imageAdress }} style={styles.image} />
+            <Image source={{ uri: row.picture }} style={styles.image} />
             <View style={styles.cardBody}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 20 }}>{row.label}</Text>
-                <Text>{`Existencia: ${row.cantidad}`}</Text>
+                <Text style={{ fontSize: 20 }}>{row.name}</Text>
+                <Text>{`Existencia: ${row.existence}`}</Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button
@@ -150,7 +150,7 @@ function Medicinas(props) {
             </View>
           </View>
         ))}
-      </View>
+      </Content>
       {state.showModalDelete && (
         <ConfirmModal
           title="Eliminar Medicamento"
@@ -168,7 +168,7 @@ function Medicinas(props) {
           enableReinitialize
           initialValues={{ nombre: '', existencia: '' }}
           validationSchema={validationSchema}
-          onSubmit={() => {}}
+          onSubmit={create}
         >
           {({ handleSubmit }) => (
             <View style={{ width: '100%' }}>

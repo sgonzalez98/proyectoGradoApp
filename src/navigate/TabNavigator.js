@@ -2,10 +2,10 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Alertas from 'pages/Alertas';
-import SecondPage from 'pages/secondPage';
-import ThirdPage from 'pages/thirdPage';
+import Calendario from 'pages/Calendario';
+import Historial from 'pages/Historial';
 import Medicinas from 'pages/Medicinas';
-import Configuracion from 'pages/configuracion';
+import Configuracion from 'pages/Configuracion';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
@@ -26,6 +26,7 @@ const customTabButton = (children, onPress) => (
     }}
     >
       {children}
+      <Text style={{ fontSize: 12, color: 'white' }}>Calendario</Text>
     </View>
   </TouchableOpacity>
 );
@@ -58,25 +59,31 @@ function MyTabs() {
         options={{ tabBarIcon: ({ focused }) => customIcon('bell', 'Alertas', focused) }}
       />
       <Tab.Screen
-        name="Second"
-        component={SecondPage}
-        options={{ tabBarIcon: ({ focused }) => customIcon('clipboard-list', 'Registros', focused) }}
+        name="Historial"
+        component={Historial}
+        options={{ tabBarIcon: ({ focused }) => customIcon('clipboard-list', 'Historial', focused) }}
       />
       <Tab.Screen
+        name="Calendario"
+        component={Calendario}
+        options={{ tabBarIcon: ({ focused }) => customIcon('calendar-alt', 'Calendario', focused) }}
+      />
+
+      {/* <Tab.Screen
         name="Third"
         component={ThirdPage}
         options={{
-          tabBarIcon: () => (<Icon name="calendar-alt" style={{ fontSize: 30, color: '#fff' }} />),
+          tabBarIcon: () => (<Icon name="calendar-alt" style={{ fontSize: 24, color: '#fff' }} />),
           tabBarButton: ({ children, onPress }) => customTabButton(children, onPress),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Medicinas"
         component={Medicinas}
         options={{ tabBarIcon: ({ focused }) => customIcon('capsules', 'Medicinas', focused) }}
       />
       <Tab.Screen
-        name="Fifth"
+        name="Configuracion"
         component={Configuracion}
         options={{ tabBarIcon: ({ focused }) => customIcon('cog', 'Ajustes', focused) }}
       />

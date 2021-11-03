@@ -2,8 +2,24 @@ import React from 'react';
 import { ApiServiceFetch } from 'services';
 
 export default (WrappedComponent) => class extends React.PureComponent {
+  // eslint-disable-next-line class-methods-use-this
   doRequest = async (type, data) => {
-    const initialResponse = await this.resolveFunc(type, data);
+    let initialResponse = null;
+    switch (type) {
+      case 'post':
+        initialResponse = await ApiServiceFetch.post(data);
+        break;
+      case 'put':
+        initialResponse = await ApiServiceFetch.put(data);
+        break;
+      case 'delete':
+        initialResponse = await ApiServiceFetch.delete(data);
+        break;
+      default:
+        initialResponse = await ApiServiceFetch.get(data);
+        break;
+    }
+
     if (initialResponse.ok) {
       if (initialResponse.status === 204) {
         return null;
@@ -22,25 +38,6 @@ export default (WrappedComponent) => class extends React.PureComponent {
   doDelete = async (data) => this.doRequest('delete', data);
 
   doPut = async (data) => this.doRequest('put', data);
-
-  static resolveFunc = async (type, data) => {
-    let response = null;
-    switch (type) {
-      case 'post':
-        response = await ApiServiceFetch.post(data);
-        break;
-      case 'put':
-        response = await ApiServiceFetch.put(data);
-        break;
-      case 'delete':
-        response = await ApiServiceFetch.delete(data);
-        break;
-      default:
-        response = await ApiServiceFetch.get(data);
-        break;
-    }
-    return response;
-  };
 
   render() {
     return (
