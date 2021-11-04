@@ -9,6 +9,8 @@ import { Field, Formik } from 'formik';
 import { withApi, withToast } from 'providers';
 import * as Yup from 'yup';
 import { endPoints } from 'constants';
+import messages from 'constants/messages';
+import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
   container: {
@@ -36,31 +38,19 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'stretch',
   },
-  addButton: {
-    position: 'absolute',
-    top: -30,
-    right: 40,
-    backgroundColor: '#748c94',
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.00,
-    elevation: 24,
+  titleForm: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 5,
+    marginBottom: 20,
   },
 });
 
 const imageAdress = 'https://png.pngtree.com/png-clipart/20200226/original/pngtree-medicines-red-medicine-drug-hospital-png-image_5320658.jpg';
 
 const initialState = {
-  showModalDelete: false,
+  idToDelete: null,
+  idToUpdate: null,
   showModalForm: false,
   data: [],
 };
@@ -70,49 +60,88 @@ const validationSchema = Yup.object({
   existencia: Yup.number().required('La existencia es requerida'),
 });
 
-function Medicinas({
-  appError, navigation, doGet, doPost,
-}) {
+const initialValues = { nombre: '', existencia: '' };
 
+function Medicinas({
+  appError, navigation, doGet, doPost, doDelete, appSuccess, appInfo, doPut,
+}) {
   const [state, setState] = useState(initialState);
 
   const loadData = async () => {
     const url = `${endPoints.app.medicine.base}/user/1`;
     const resp = await doGet({ url });
     setState((prevState) => ({ ...prevState, data: resp }));
-  }
+  };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       try {
         loadData();
       } catch (error) {
-        appError(error.message ? error.message : messages.crud.fail);
+        appError(error.message ? error.message : messages.dataFetch.fail);
       }
     });
 
     return unsubscribe;
   }, []);
 
-  const create = async(values, subProps) => {
+  const openFormModal = async (id = null) => {
+    if (id) {
+      try {
+        const url = `${endPoints.app.medicine.base}/${id}`;
+        const data = await doGet({ url });
+
+        initialValues.existencia = data.existence;
+        initialValues.nombre = data.name;
+        setState((prevState) => ({ ...prevState, idToUpdate: id, showModalForm: true }));
+      } catch (error) {
+        appError(error.message ? error.message : messages.crud.fail);
+      }
+    } else {
+      setState((prevState) => ({ ...prevState, showModalForm: true }));
+    }
+  };
+
+  const createData = async (values) => {
     try {
       const url = endPoints.app.medicine.base;
       const data = {
         name: values.nombre,
         existence: values.existencia,
-        picture: imageAdress,
-        userId: 1,
       };
 
-      await doPost({ url, data });
-      setState((prevState) => ({ ...prevState, showModalForm: false}));
+      if (state.idToUpdate) {
+        data.id = state.idToUpdate;
+
+        await doPut({ url, data });
+        appInfo(messages.crud.update);
+      } else {
+        data.picture = imageAdress;
+        data.userId = 1;
+
+        await doPost({ url, data });
+        appSuccess(messages.crud.new);
+      }
+
+      setState((prevState) => ({ ...prevState, idToUpdate: null, showModalForm: false }));
       loadData();
     } catch (error) {
       appError(error.message ? error.message : messages.crud.fail);
     }
-  }
+  };
 
+  const deleteData = async () => {
+    try {
+      const url = `${endPoints.app.medicine.base}?medicineId=${state.idToDelete}`;
 
+      await doDelete({ url });
+      appInfo(messages.crud.delete);
+      setState((prevState) => ({ ...prevState, idToDelete: null }));
+      loadData();
+    } catch (error) {
+      appError(error.message ? error.message : messages.crud.fail);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -122,7 +151,7 @@ function Medicinas({
           type="warning"
           text="Crear nueva medicina"
           iconName="plus"
-          onPress={() => setState((prevState) => ({ ...prevState, showModalForm: true }))}
+          onPress={() => openFormModal()}
         />
         {state.data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
@@ -135,14 +164,14 @@ function Medicinas({
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button
                   text="Editar"
-                  onPress={() => setState((prevState) => ({ ...prevState, showModalForm: true }))}
+                  onPress={() => openFormModal(row.id)}
                   type="warning"
                   iconName="edit"
                   style={{ marginRight: 5 }}
                 />
                 <Button
                   text="Eliminar"
-                  onPress={() => setState((prevState) => ({ ...prevState, showModalDelete: true }))}
+                  onPress={() => setState((prevState) => ({ ...prevState, idToDelete: row.id }))}
                   type="danger"
                   iconName="trash"
                 />
@@ -151,24 +180,24 @@ function Medicinas({
           </View>
         ))}
       </Content>
-      {state.showModalDelete && (
+      {Boolean(state.idToDelete) && (
         <ConfirmModal
           title="Eliminar Medicamento"
           description="¿Esta seguro de eliminar este medicamento?"
-          onAccept={() => setState((prevState) => ({ ...prevState, showModalDelete: false }))}
-          onCancel={() => setState((prevState) => ({ ...prevState, showModalDelete: false }))}
+          onAccept={deleteData}
+          onCancel={() => setState((prevState) => ({ ...prevState, idToDelete: null }))}
           labelAccept="Eliminar"
           labelCancel="Cancelar"
         />
       )}
       {state.showModalForm && (
       <Modal visible>
-        <Text style={{ fontWeight: 'bold', margin: 5 }}>Creacion o actualizacion de medicinas</Text>
+        <Text style={styles.titleForm}>{`${state.idToUpdate ? 'Actualización' : 'Creación'} de medicinas`}</Text>
         <Formik
           enableReinitialize
-          initialValues={{ nombre: '', existencia: '' }}
+          initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={create}
+          onSubmit={createData}
         >
           {({ handleSubmit }) => (
             <View style={{ width: '100%' }}>
@@ -215,5 +244,16 @@ function Medicinas({
     </ScrollView>
   );
 }
+
+Medicinas.propTypes = {
+  navigation: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  appError: PropTypes.func.isRequired,
+  appInfo: PropTypes.func.isRequired,
+  doGet: PropTypes.func.isRequired,
+  doPost: PropTypes.func.isRequired,
+  doDelete: PropTypes.func.isRequired,
+  appSuccess: PropTypes.func.isRequired,
+  doPut: PropTypes.func.isRequired,
+};
 
 export default withToast(withApi(Medicinas));
