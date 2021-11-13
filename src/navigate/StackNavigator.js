@@ -11,16 +11,8 @@ function MyStack() {
   const options = { headerShown: false };
   return (
     <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={options}
-      />
-      <Stack.Screen
-        name="Drawer"
-        component={TabNavigator}
-        options={options}
-      />
+      <Stack.Screen name="Login" component={Login} options={options} />
+      <Stack.Screen name="Drawer" component={TabNavigator} options={options} />
     </Stack.Navigator>
   );
 }

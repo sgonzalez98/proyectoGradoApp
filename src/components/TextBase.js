@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const styles = StyleSheet.create({
   container: {
-    height: 40,
+    minHeight: 40,
     flexDirection: 'row',
     borderWidth: 0.5,
     borderRadius: 8,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, ConfirmModal, Modal, TextBase, TopCard, Content,
+  Button, ConfirmModal, Modal, TextBase, TopCard, Content, DatePicker,
 } from 'components';
 import {
   Image, ScrollView, StyleSheet, Text, View,
@@ -11,7 +11,6 @@ import * as Yup from 'yup';
 import { endPoints } from 'constants';
 import messages from 'constants/messages';
 import PropTypes from 'prop-types';
-import DatePicker from 'react-native-date-picker';
 
 const styles = StyleSheet.create({
   container: {
@@ -63,11 +62,10 @@ const validationSchema = Yup.object({
 
 const initialValues = { nombre: '', existencia: '' };
 
-function Medicinas({
+function CalendarioList({
   appError, navigation, doGet, doPost, doDelete, appSuccess, appInfo, doPut,
 }) {
   const [state, setState] = useState(initialState);
-  const [date, setDate] = useState(new Date());
 
   const loadData = async () => {
     const url = `${endPoints.app.medicine.base}/user/1`;
@@ -153,9 +151,9 @@ function Medicinas({
           type="warning"
           text="Crear nuevo calendario"
           iconName="plus"
-          onPress={() => openFormModal()}
+          onPress={() => navigation.navigate('CalendarioForm')}
         />
-        <DatePicker date={date} onDateChange={setDate} />
+        <DatePicker />
         {state.data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
             <Image source={{ uri: row.picture }} style={styles.image} />
@@ -167,7 +165,7 @@ function Medicinas({
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button
                   text="Editar"
-                  onPress={() => openFormModal(row.id)}
+                  onPress={() => navigation.navigate('CalendarioForm', { id: row.id })}
                   type="warning"
                   iconName="edit"
                   style={{ marginRight: 5 }}
@@ -248,7 +246,7 @@ function Medicinas({
   );
 }
 
-Medicinas.propTypes = {
+CalendarioList.propTypes = {
   navigation: PropTypes.oneOfType([PropTypes.object]).isRequired,
   appError: PropTypes.func.isRequired,
   appInfo: PropTypes.func.isRequired,
@@ -259,4 +257,4 @@ Medicinas.propTypes = {
   doPut: PropTypes.func.isRequired,
 };
 
-export default withToast(withApi(Medicinas));
+export default withToast(withApi(CalendarioList));

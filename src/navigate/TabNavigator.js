@@ -1,8 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Alertas from 'pages/Alertas';
-import Calendario from 'pages/Calendario';
+import CalendarioList from 'pages/Calendario';
+import CalendarioForm from 'pages/Calendario/form';
 import Historial from 'pages/Historial';
 import Medicinas from 'pages/Medicinas';
 import Configuracion from 'pages/Configuracion';
@@ -17,6 +19,18 @@ const customIcon = (iconName, text, focused) => (
     <Text style={{ fontSize: 12, color: focused ? '#0A99FF' : '#748c94' }}>{text}</Text>
   </View>
 );
+
+const stackOptions = { headerShown: false };
+const CalendarioStack = createNativeStackNavigator();
+
+function CalendarioStackNavigation() {
+  return (
+    <CalendarioStack.Navigator initialRouteName="CalendarioList">
+      <CalendarioStack.Screen name="CalendarioList" component={CalendarioList} options={stackOptions} />
+      <CalendarioStack.Screen name="CalendarioForm" component={CalendarioForm} options={stackOptions} />
+    </CalendarioStack.Navigator>
+  );
+}
 
 function MyTabs() {
   return (
@@ -45,7 +59,7 @@ function MyTabs() {
       />
       <Tab.Screen
         name="Calendario"
-        component={Calendario}
+        component={CalendarioStackNavigation}
         options={{ tabBarIcon: ({ focused }) => customIcon('calendar-alt', 'Calendario', focused) }}
       />
       <Tab.Screen
