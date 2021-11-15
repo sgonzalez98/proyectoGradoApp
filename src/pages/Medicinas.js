@@ -8,8 +8,7 @@ import {
 import { Field, Formik } from 'formik';
 import { withApi, withToast } from 'providers';
 import * as Yup from 'yup';
-import { endPoints } from 'constants';
-import messages from 'constants/messages';
+import { endPoints, messages } from 'constantes';
 import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
@@ -63,26 +62,22 @@ const validationSchema = Yup.object({
 const initialValues = { nombre: '', existencia: '' };
 
 function Medicinas({
-  appError, navigation, doGet, doPost, doDelete, appSuccess, appInfo, doPut,
+  appError, doGet, doPost, doDelete, appSuccess, appInfo, doPut,
 }) {
   const [state, setState] = useState(initialState);
 
   const loadData = async () => {
-    const url = `${endPoints.app.medicine.base}/user/1`;
+    const url = `${endPoints.app.medicine.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
     const resp = await doGet({ url });
     setState((prevState) => ({ ...prevState, data: resp }));
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      try {
-        loadData();
-      } catch (error) {
-        appError(error.message ? error.message : messages.dataFetch.fail);
-      }
-    });
-
-    return unsubscribe;
+    try {
+      loadData();
+    } catch (error) {
+      appError(error.message ? error.message : messages.dataFetch.fail);
+    }
   }, []);
 
   const openFormModal = async (id = null) => {
@@ -117,7 +112,7 @@ function Medicinas({
         appInfo(messages.crud.update);
       } else {
         data.picture = imageAdress;
-        data.userId = 1;
+        data.userId = 'f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def';
 
         await doPost({ url, data });
         appSuccess(messages.crud.new);
@@ -144,7 +139,7 @@ function Medicinas({
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <TopCard title="Inventario de medicinas" iconName="capsules" />
       <Content>
         <Button
@@ -246,7 +241,6 @@ function Medicinas({
 }
 
 Medicinas.propTypes = {
-  navigation: PropTypes.oneOfType([PropTypes.object]).isRequired,
   appError: PropTypes.func.isRequired,
   appInfo: PropTypes.func.isRequired,
   doGet: PropTypes.func.isRequired,

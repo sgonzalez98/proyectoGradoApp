@@ -18,11 +18,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Content({ children }) {
+export default function Content({ children, style }) {
   return (
     <>
       <View style={{ ...StyleSheet.absoluteFillObject, ...styles.absotuleCard }} />
-      <View style={styles.content}>
+      <View style={[styles.content, style]}>
         {children}
       </View>
     </>
@@ -31,4 +31,9 @@ export default function Content({ children }) {
 
 Content.propTypes = {
   children: PropTypes.node.isRequired,
+  style: PropTypes.oneOfType([PropTypes.object]),
+};
+
+Content.defaultProps = {
+  style: {},
 };

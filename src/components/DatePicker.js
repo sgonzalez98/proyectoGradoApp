@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet, Text, TouchableOpacity, View,
+} from 'react-native';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
@@ -18,20 +20,31 @@ const styles = StyleSheet.create({
   },
 });
 
-function DatePickerComponent({ label }) {
-  const [date, setDate] = useState(new Date());
+function DatePickerComponent(props) {
   const [showModal, setShowModal] = useState(false);
+  const {
+    field: { name, value },
+    form: { touched, errors, setFieldValue },
+    label,
+    style,
+    ...otheProps
+  } = props;
+  const hasError = touched[name] && Boolean(errors[name]);
+  const borderColor = hasError ? 'red' : 'black';
   return (
     <>
-      <TouchableOpacity style={styles.button} onPress={() => setShowModal(true)}>
+      <TouchableOpacity
+        style={[styles.button, { borderColor }, style]}
+        onPress={() => setShowModal(true)}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Icon name="calendar" style={{ fontSize: 25, marginRight: 8 }} />
           <Text>{label}</Text>
         </View>
-        <Text>{moment(date).format('YYYY-MM-DD h:mm:ss A')}</Text>
+        <Text>{ value ? moment(value).format('YYYY-MM-DD h:mm A') : ''}</Text>
       </TouchableOpacity>
       <DatePicker
-        date={date}
+        date={value}
         locale="es"
         modal
         title="Seleccionar una fecha"
@@ -42,11 +55,12 @@ function DatePickerComponent({ label }) {
         minuteInterval={5}
         onConfirm={(newDate) => {
           setShowModal(false);
-          setDate(newDate);
+          setFieldValue(name, newDate);
         }}
         onCancel={() => {
           setShowModal(false);
         }}
+        {...otheProps}
       />
     </>
   );
@@ -54,9 +68,13 @@ function DatePickerComponent({ label }) {
 
 DatePickerComponent.propTypes = {
   label: PropTypes.string.isRequired,
+  field: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  form: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  style: PropTypes.oneOfType([PropTypes.object]),
 };
 
 DatePickerComponent.defaultProps = {
+  style: {},
 };
 
 export default DatePickerComponent;

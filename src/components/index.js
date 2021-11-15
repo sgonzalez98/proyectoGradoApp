@@ -6,3 +6,4 @@ export { default as TopCard } from './TopCard';
 export { default as Content } from './Content';
 export { default as DatePicker } from './DatePicker';
 export { default as Picker } from './Picker';
+export { default as Numeric } from './Numeric';

@@ -1,17 +1,39 @@
 import React from 'react';
-import {
-  Item, Input, Icon, Button,
-} from 'native-base';
-import { Text } from 'react-native';
 import PropTypes from 'prop-types';
+import {
+  Text, TouchableOpacity as Touchable, View, TextInput,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const Numeric = ({
+const styles = {
+  button: {
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: 'gray',
+    width: 30,
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  extraIcon: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  icon: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+};
+
+const NumericBase = ({
   field: {
     name, value, onBlur, onChange,
   },
   form: { touched, errors, setFieldValue },
   maxValue,
   label,
+  showExtraButton,
   ...props
 }) => {
   const hasError = touched[name] && Boolean(errors[name]);
@@ -24,41 +46,59 @@ const Numeric = ({
     }
     return num;
   };
+  const substract = (increment) => {
+    setFieldValue(name, number(parseInt(value || 0, 10) - increment));
+  };
+  const add = (increment) => {
+    setFieldValue(name, number(parseInt(value || 0, 10) + increment));
+  };
   return (
-    <>
+    <View>
       <Text>{label}</Text>
-      <Item error={hasError}>
-        <Button
-          bordered
-          style={{ borderRadius: 8 }}
-          onPress={() => setFieldValue(name, number(parseInt(value || 0, 10) - 1))}
-        >
-          <Icon name="remove" style={{ fontSize: 15 }} />
-        </Button>
-        <Input
+      <View style={{ flexDirection: 'row', paddingHorizontal: 10 }}>
+        {showExtraButton && (
+          <Touchable style={[styles.button, { marginRight: 10 }]} onPress={() => substract(10)}>
+            <Text style={styles.extraIcon}>-10</Text>
+          </Touchable>
+        )}
+        <Touchable style={styles.button} onPress={() => substract(1)}>
+          <Text style={styles.icon}>-</Text>
+        </Touchable>
+        <TextInput
           name={name}
           value={String(value)}
-          autoCompleteType="off"
-          keyboardType="numeric"
           onBlur={(event) => onBlur(name)(event)}
           onChangeText={(event) => onChange(name)(event)}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="next"
-          showSoftInputOnFocus={false}
+          editable={false}
+          textAlign="center"
           {...props}
+          style={{ flex: 1, color: 'black' }}
         />
         {hasError && <Icon name="close-circle" />}
-        <Button
-          bordered
-          style={{ borderRadius: 8 }}
-          onPress={() => setFieldValue(name, number(parseInt(value || 0, 10) + 1))}
-        >
-          <Icon name="add" style={{ fontSize: 15 }} />
-        </Button>
-      </Item>
-    </>
+        <Touchable style={styles.button} onPress={() => add(1)}>
+          <Text style={styles.icon}>+</Text>
+        </Touchable>
+        {showExtraButton && (
+          <Touchable style={[styles.button, { marginLeft: 10 }]} onPress={() => add(10)}>
+            <Text style={styles.extraIcon}>+10</Text>
+          </Touchable>
+        )}
+      </View>
+    </View>
   );
 };
 
-export default Numeric;
+NumericBase.propTypes = {
+  field: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  form: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  maxValue: PropTypes.number,
+  showExtraButton: PropTypes.bool,
+  label: PropTypes.string.isRequired,
+};
+
+NumericBase.defaultProps = {
+  maxValue: null,
+  showExtraButton: false,
+};
+
+export default NumericBase;

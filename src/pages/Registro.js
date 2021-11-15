@@ -38,12 +38,12 @@ const initialState = {
   data: [],
 };
 
-function Alertas({ doGet, appError }) {
+function Registros({ doGet, appError }) {
   const [state, setState] = useState(initialState);
   const setPrevState = (newState) => setState((prevState) => ({ ...prevState, ...newState }));
 
   const loadData = async () => {
-    const url = `${endPoints.app.register.pending}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
+    const url = `${endPoints.app.register.complete}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
     const resp = await doGet({ url });
     setPrevState({ data: resp });
   };
@@ -58,7 +58,7 @@ function Alertas({ doGet, appError }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TopCard title="Alertas Medicas" iconName="bell" />
+      <TopCard title="Registros" iconName="clipboard-list" />
       <Content>
         {state.data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
@@ -77,9 +77,9 @@ function Alertas({ doGet, appError }) {
   );
 }
 
-Alertas.propTypes = {
+Registros.propTypes = {
   appError: PropTypes.func.isRequired,
   doGet: PropTypes.func.isRequired,
 };
 
-export default withToast(withApi(Alertas));
+export default withToast(withApi(Registros));

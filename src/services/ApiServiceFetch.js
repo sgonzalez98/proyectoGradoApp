@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { API_SERVER, API_VERSION } from '@env';
-import { endPoints } from 'constants';
+import { endPoints } from 'constantes';
 import StorageService from './StorageService';
 
 const BEARER_PREFIX = 'Bearer';

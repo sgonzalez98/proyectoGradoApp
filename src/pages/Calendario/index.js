@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, ConfirmModal, Modal, TextBase, TopCard, Content, DatePicker,
+  Button, ConfirmModal, TopCard, Content,
 } from 'components';
 import {
   Image, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
-import { Field, Formik } from 'formik';
 import { withApi, withToast } from 'providers';
-import * as Yup from 'yup';
-import { endPoints } from 'constants';
-import messages from 'constants/messages';
+import { endPoints, messages } from 'constantes';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 const styles = StyleSheet.create({
   container: {
@@ -46,93 +44,33 @@ const styles = StyleSheet.create({
   },
 });
 
-const imageAdress = 'https://png.pngtree.com/png-clipart/20200226/original/pngtree-medicines-red-medicine-drug-hospital-png-image_5320658.jpg';
-
 const initialState = {
   idToDelete: null,
-  idToUpdate: null,
-  showModalForm: false,
   data: [],
 };
 
-const validationSchema = Yup.object({
-  nombre: Yup.string().required('El nombre es requerido'),
-  existencia: Yup.number().required('La existencia es requerida'),
-});
-
-const initialValues = { nombre: '', existencia: '' };
-
 function CalendarioList({
-  appError, navigation, doGet, doPost, doDelete, appSuccess, appInfo, doPut,
+  appError, navigation, doGet, doDelete, appInfo,
 }) {
   const [state, setState] = useState(initialState);
 
   const loadData = async () => {
-    const url = `${endPoints.app.medicine.base}/user/1`;
+    const url = `${endPoints.app.calendar.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
     const resp = await doGet({ url });
     setState((prevState) => ({ ...prevState, data: resp }));
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      try {
-        loadData();
-      } catch (error) {
-        appError(error.message ? error.message : messages.dataFetch.fail);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const openFormModal = async (id = null) => {
-    if (id) {
-      try {
-        const url = `${endPoints.app.medicine.base}/${id}`;
-        const data = await doGet({ url });
-
-        initialValues.existencia = data.existence;
-        initialValues.nombre = data.name;
-        setState((prevState) => ({ ...prevState, idToUpdate: id, showModalForm: true }));
-      } catch (error) {
-        appError(error.message ? error.message : messages.crud.fail);
-      }
-    } else {
-      setState((prevState) => ({ ...prevState, showModalForm: true }));
-    }
-  };
-
-  const createData = async (values) => {
     try {
-      const url = endPoints.app.medicine.base;
-      const data = {
-        name: values.nombre,
-        existence: values.existencia,
-      };
-
-      if (state.idToUpdate) {
-        data.id = state.idToUpdate;
-
-        await doPut({ url, data });
-        appInfo(messages.crud.update);
-      } else {
-        data.picture = imageAdress;
-        data.userId = 1;
-
-        await doPost({ url, data });
-        appSuccess(messages.crud.new);
-      }
-
-      setState((prevState) => ({ ...prevState, idToUpdate: null, showModalForm: false }));
       loadData();
     } catch (error) {
-      appError(error.message ? error.message : messages.crud.fail);
+      appError(error.message ? error.message : messages.dataFetch.fail);
     }
-  };
+  }, []);
 
   const deleteData = async () => {
     try {
-      const url = `${endPoints.app.medicine.base}?medicineId=${state.idToDelete}`;
+      const url = `${endPoints.app.calendar.base}?calendarId=${state.idToDelete}`;
 
       await doDelete({ url });
       appInfo(messages.crud.delete);
@@ -153,14 +91,17 @@ function CalendarioList({
           iconName="plus"
           onPress={() => navigation.navigate('CalendarioForm')}
         />
-        <DatePicker />
         {state.data.map((row, i) => (
           <View style={styles.card} key={String(i)}>
             <Image source={{ uri: row.picture }} style={styles.image} />
             <View style={styles.cardBody}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 20 }}>{row.name}</Text>
-                <Text>{`Existencia: ${row.existence}`}</Text>
+                <Text>{`Desde: ${moment(row.dateFrom).format('YYYY-MM-DD h:mm A')}`}</Text>
+                <Text>{`Hasta: ${moment(row.dateTo).format('YYYY-MM-DD h:mm A')}`}</Text>
+                <Text>{`Periodicidad: cada ${row.periodicity} horas`}</Text>
+                <Text>{`Medicina: ${row.medicine}`}</Text>
+                <Text>{`Cantidad: ${row.amount}`}</Text>
+                <Text>{`Observación: ${row.observation}`}</Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button
@@ -191,57 +132,6 @@ function CalendarioList({
           labelCancel="Cancelar"
         />
       )}
-      {state.showModalForm && (
-      <Modal visible>
-        <Text style={styles.titleForm}>{`${state.idToUpdate ? 'Actualización' : 'Creación'} de medicinas`}</Text>
-        <Formik
-          enableReinitialize
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={createData}
-        >
-          {({ handleSubmit }) => (
-            <View style={{ width: '100%' }}>
-              <Field
-                label="Nombre"
-                name="nombre"
-                component={TextBase}
-                style={{ marginBottom: 10 }}
-              />
-              <Field
-                label="Existencia"
-                name="existencia"
-                keyboardType="numeric"
-                component={TextBase}
-                style={{ marginBottom: 10 }}
-              />
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                width: '100%',
-                marginTop: 10,
-              }}
-              >
-                <Button
-                  type="warning"
-                  text="Cancelar"
-                  iconName="exclamation-triangle"
-                  style={{ width: '45%', borderRadius: 10 }}
-                  onPress={() => setState((prevState) => (
-                    { ...prevState, showModalForm: false }))}
-                />
-                <Button
-                  text="Guardar"
-                  iconName="save"
-                  style={{ width: '45%', borderRadius: 10 }}
-                  onPress={handleSubmit}
-                />
-              </View>
-            </View>
-          )}
-        </Formik>
-      </Modal>
-      )}
     </ScrollView>
   );
 }
@@ -251,10 +141,7 @@ CalendarioList.propTypes = {
   appError: PropTypes.func.isRequired,
   appInfo: PropTypes.func.isRequired,
   doGet: PropTypes.func.isRequired,
-  doPost: PropTypes.func.isRequired,
   doDelete: PropTypes.func.isRequired,
-  appSuccess: PropTypes.func.isRequired,
-  doPut: PropTypes.func.isRequired,
 };
 
 export default withToast(withApi(CalendarioList));

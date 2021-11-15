@@ -8,5 +8,13 @@ export default {
     medicine: {
       base: 'medicine',
     },
+    calendar: {
+      base: 'calendar',
+    },
+    register: {
+      base: 'register',
+      complete: 'register/complete',
+      pending: 'register/pending',
+    },
   },
 };

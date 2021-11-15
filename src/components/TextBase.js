@@ -7,7 +7,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 40,
     flexDirection: 'row',
     borderWidth: 0.5,
     borderRadius: 8,
@@ -29,14 +28,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function TextBase(props) {
+function TextBase({ getRef, ...props }) {
   const ref = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (props.getRef) {
-      props.getRef(ref);
+    if (getRef) {
+      getRef(ref);
     }
   });
 
@@ -51,10 +50,12 @@ function TextBase(props) {
     ...otheProps
   } = props;
   const hasError = touched[name] && Boolean(errors[name]);
-  const borderColor = hasError ? 'red' : 'black';
+  const borderColorError = hasError ? 'red' : 'black';
+  const borderColor = isFocused ? '#1a59b5' : borderColorError;
+  const containerHeight = otheProps.multiline ? 70 : 40;
   return (
     <View style={style}>
-      <TouchableOpacity style={[styles.container, { borderColor: isFocused ? '#1a59b5' : borderColor }]}>
+      <TouchableOpacity style={[styles.container, { borderColor, height: containerHeight }]}>
         <TextInput
           name={name}
           onFocus={() => setFocused(true)}

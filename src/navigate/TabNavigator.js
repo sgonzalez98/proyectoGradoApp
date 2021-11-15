@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Alertas from 'pages/Alertas';
 import CalendarioList from 'pages/Calendario';
 import CalendarioForm from 'pages/Calendario/form';
-import Historial from 'pages/Historial';
+import Registro from 'pages/Registro';
 import Medicinas from 'pages/Medicinas';
 import Configuracion from 'pages/Configuracion';
 import { Text, View } from 'react-native';
@@ -37,6 +37,7 @@ function MyTabs() {
     <Tab.Navigator
       initialRouteName="Alertas"
       screenOptions={{
+        unmountOnBlur: true,
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -53,9 +54,9 @@ function MyTabs() {
         options={{ tabBarIcon: ({ focused }) => customIcon('bell', 'Alertas', focused) }}
       />
       <Tab.Screen
-        name="Historial"
-        component={Historial}
-        options={{ tabBarIcon: ({ focused }) => customIcon('clipboard-list', 'Historial', focused) }}
+        name="Registro"
+        component={Registro}
+        options={{ tabBarIcon: ({ focused }) => customIcon('clipboard-list', 'Registro', focused) }}
       />
       <Tab.Screen
         name="Calendario"

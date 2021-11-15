@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApiServiceFetch, StorageService } from 'services';
 // import JwtDecode from 'jwt-decode';
-import endPoints from 'constants/endPoints';
+import { endPoints } from 'constantes';
 
 export default (WrappedComponent) => class extends React.PureComponent {
   static doLogin = async (params) => {

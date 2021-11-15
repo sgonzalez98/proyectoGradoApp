@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    padding: 5,
+    padding: 8,
   },
   icon: {
     fontSize: 20,

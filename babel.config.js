@@ -4,7 +4,7 @@ module.exports = {
     ['module-resolver', {
       alias: {
         components: './src/components',
-        constants: './src/constants',
+        constantes: './src/constantes',
         services: './src/services',
         providers: './src/providers',
         navigate: './src/navigate',

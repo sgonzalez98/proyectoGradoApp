@@ -3,14 +3,14 @@ import {
   Button, TextBase, TopCard, Content, DatePicker, Picker,
 } from 'components';
 import {
-  ScrollView, StyleSheet, Text, View,
+  ScrollView, StyleSheet, View,
 } from 'react-native';
 import { Field, Formik } from 'formik';
 import { withApi, withToast } from 'providers';
 import * as Yup from 'yup';
-import { endPoints } from 'constants';
-import messages from 'constants/messages';
+import { endPoints, messages } from 'constantes';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 const styles = StyleSheet.create({
   container: {
@@ -47,20 +47,22 @@ const styles = StyleSheet.create({
 });
 
 const initialState = {
-  idToDelete: null,
   idToUpdate: null,
-  showModalForm: false,
-  data: [],
+  medicinasList: [],
+  calendar: null,
 };
 
 const validationSchema = Yup.object({
-  nombre: Yup.string().required('El nombre es requerido'),
-  existencia: Yup.number().required('La existencia es requerida'),
+  desde: Yup.date().required('La fecha inicio es requerida'),
+  hasta: Yup.date().required('La fecha fin es requerida'),
+  periodisidad: Yup.number().required('La periodisidad es requerida'),
+  medicina: Yup.string().required('La medicina es requerida'),
+  cantidad: Yup.number().required('La cantidad de medicina es requerida'),
 });
 
-const initialValues = {
-  desde: '',
-  hasta: '',
+let initialValues = {
+  desde: new Date(),
+  hasta: new Date(),
   periodisidad: '',
   medicina: '',
   cantidad: '',
@@ -73,16 +75,34 @@ function CalendarioForm({
 }) {
   const [state, setState] = useState(initialState);
 
-  const loadData = async () => {
-    const url = `${endPoints.app.medicine.base}/user/1`;
+  const loadMedicina = async () => {
+    const url = `${endPoints.app.medicine.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
     const resp = await doGet({ url });
-    setState((prevState) => ({ ...prevState, data: resp }));
+    const medicinasList = resp.map((row) => ({ value: row.id, label: row.name }));
+    setState((prevState) => ({ ...prevState, medicinasList }));
+  };
+
+  const findCalendar = async () => {
+    const url = `${endPoints.app.calendar.base}/${id}`;
+    const resp = await doGet({ url });
+    initialValues = {
+      desde: new Date(moment(resp.dateFrom)),
+      hasta: new Date(moment(resp.dateTo)),
+      periodisidad: resp.periodicity,
+      medicina: resp.medicine,
+      cantidad: resp.amount,
+      observacion: resp.observation,
+    };
+    setState((prevState) => ({ ...prevState, calendar: resp }));
   };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       try {
-        loadData();
+        loadMedicina();
+        if (id) {
+          findCalendar();
+        }
       } catch (error) {
         appError(error.message ? error.message : messages.dataFetch.fail);
       }
@@ -93,36 +113,38 @@ function CalendarioForm({
 
   const createData = async (values) => {
     try {
-      const url = endPoints.app.medicine.base;
+      const url = endPoints.app.calendar.base;
       const data = {
-        name: values.nombre,
-        existence: values.existencia,
+        amount: values.cantidad,
+        dateFrom: moment(values.desde).format('YYYY-MM-DD HH:mm:ss'),
+        dateTo: moment(values.hasta).format('YYYY-MM-DD HH:mm:ss'),
+        medicine: values.medicina,
+        observation: values.observacion,
+        periodicity: values.periodisidad,
+        status: true,
       };
 
-      if (state.idToUpdate) {
-        data.id = state.idToUpdate;
+      if (id) {
+        data.id = id;
 
         await doPut({ url, data });
         appInfo(messages.crud.update);
       } else {
-        data.userId = 1;
+        data.userId = 'f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def';
 
         await doPost({ url, data });
         appSuccess(messages.crud.new);
+        navigation.goBack();
       }
-
-      setState((prevState) => ({ ...prevState, idToUpdate: null, showModalForm: false }));
-      loadData();
     } catch (error) {
       appError(error.message ? error.message : messages.crud.fail);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <TopCard title="Creacion de calendario" iconName="calendar-alt" />
-      <Content>
-        <Text style={styles.titleForm}>{`${id ? 'Actualización' : 'Creación'} de medicinas`}</Text>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      <TopCard title={`${id ? 'Actualización' : 'Creación'} de calendario`} iconName="calendar-alt" />
+      <Content style={{ paddingTop: 20 }}>
         <Formik
           enableReinitialize
           initialValues={initialValues}
@@ -131,19 +153,29 @@ function CalendarioForm({
         >
           {({ handleSubmit }) => (
             <View style={{ width: '100%' }}>
-              <DatePicker label="Desde" />
-              <DatePicker label="Hasta" />
               <Field
-                label="Periodisidad"
+                label="Fecha Inicio"
+                name="desde"
+                component={DatePicker}
+                style={{ marginBottom: 10 }}
+              />
+              <Field
+                label="Fecha Fin"
+                name="hasta"
+                component={DatePicker}
+                style={{ marginBottom: 10 }}
+              />
+              <Field
+                label="Periodisidad (Horas)"
                 name="periodisidad"
                 keyboardType="numeric"
                 component={TextBase}
                 style={{ marginBottom: 10 }}
               />
               <Field
-                label="Medicina"
+                label="Seleccione una medicina"
                 name="medicina"
-                items={[]}
+                items={state.medicinasList}
                 component={Picker}
                 style={{ marginBottom: 10 }}
               />
@@ -174,8 +206,7 @@ function CalendarioForm({
                   text="Cancelar"
                   iconName="exclamation-triangle"
                   style={{ width: '45%', borderRadius: 10 }}
-                  onPress={() => setState((prevState) => (
-                    { ...prevState, showModalForm: false }))}
+                  onPress={() => navigation.goBack()}
                 />
                 <Button
                   text="Guardar"
