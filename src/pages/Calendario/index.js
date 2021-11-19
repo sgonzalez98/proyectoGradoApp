@@ -99,7 +99,7 @@ function CalendarioList({
                 <Text>{`Desde: ${moment(row.dateFrom).format('YYYY-MM-DD h:mm A')}`}</Text>
                 <Text>{`Hasta: ${moment(row.dateTo).format('YYYY-MM-DD h:mm A')}`}</Text>
                 <Text>{`Periodicidad: cada ${row.periodicity} horas`}</Text>
-                <Text>{`Medicina: ${row.medicine}`}</Text>
+                <Text>{`Medicina: ${row.medicineName}`}</Text>
                 <Text>{`Cantidad: ${row.amount}`}</Text>
                 <Text>{`Observación: ${row.observation}`}</Text>
               </View>

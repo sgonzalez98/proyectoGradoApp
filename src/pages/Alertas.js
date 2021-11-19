@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ScrollView, StyleSheet, Text, View,
 } from 'react-native';
-import { TopCard, Content } from 'components';
+import { TopCard, Content, Button } from 'components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import PropTypes from 'prop-types';
 import { endPoints, messages } from 'constantes';
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     borderRadius: 10,
-    padding: 10,
+    padding: 8,
     backgroundColor: 'white',
     marginTop: 13,
     shadowColor: '#000',
@@ -32,6 +32,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#748c94',
     padding: 5,
   },
+  buttonsWrap: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
 });
 
 const initialState = {
@@ -69,6 +76,20 @@ function Alertas({ doGet, appError }) {
             <View>
               <Text>{`Cantidad: ${row.amount}`}</Text>
               <Text>{`Observación: ${row.observation}`}</Text>
+            </View>
+            <View style={styles.buttonsWrap}>
+              <Button
+                text="Completar"
+                // onPress={() => openFormModal(row.id)}
+                style={{ marginRight: 5 }}
+                iconName="calendar-check"
+              />
+              <Button
+                text="Posponer"
+                // onPress={() => setState((prevState) => ({ ...prevState, idToDelete: row.id }))}
+                type="warning"
+                iconName="clock"
+              />
             </View>
           </View>
         ))}
