@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import React from 'react';
 import {
   Dimensions,
-  Image, StyleSheet, Text, View,
+  Image, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
 import { TextBase, Button } from 'components';
 import { useNavigation } from '@react-navigation/native';
@@ -78,20 +78,25 @@ export default function Login() {
                   component={TextBase}
                   secureTextEntry
                   disabled={isSubmitting}
-                  style={{ marginTop: 15 }}
+                  style={{ marginTop: 10 }}
                 />
                 <Button
                   iconName="sign-in-alt"
                   text="Iniciar Sesión"
                   onPress={handleSubmit}
                   // disabled={isSubmitting}
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 15 }}
                 />
               </View>
             )}
           </Formik>
           {/* <div>Iconos diseñados por <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.es/" title="Flaticon">www.flaticon.es</a></div> */}
-          <Text>No tienes una cuenta, Registrate</Text>
+          <TouchableOpacity
+            style={{ marginTop: 30 }}
+            onPress={() => navigation.navigate('Register')}
+          >
+            <Text>No tienes una cuenta, Registrate</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

@@ -16,5 +16,8 @@ export default {
       complete: 'register/complete',
       pending: 'register/pending',
     },
+    user: {
+      base: 'user',
+    },
   },
 };

@@ -1,97 +1,226 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  StyleSheet, Text, View,
+  Button, TextBase, TopCard, Content, DatePicker, Picker,
+} from 'components';
+import {
+  ScrollView, StyleSheet, View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import { Field, Formik } from 'formik';
+import { withApi, withToast } from 'providers';
+import * as Yup from 'yup';
+import { endPoints, messages } from 'constantes';
+import PropTypes from 'prop-types';
+import moment from 'moment';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
   },
-  topcard: {
-    height: 100,
-    backgroundColor: '#0A99FF',
-    borderBottomRightRadius: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  absotuleCard: {
-    backgroundColor: '#0A99FF',
-    top: 100,
-    height: 50,
-  },
-  title: {
-    color: 'white',
-    fontSize: 26,
-    marginLeft: 10,
-  },
-  titleIcon: {
-    color: 'white',
-    fontSize: 30,
-    marginLeft: 20,
-  },
-  cards: {
-    height: '100%',
-    borderTopLeftRadius: 40,
-    backgroundColor: 'white',
-    padding: 10,
-    paddingLeft: 15,
-  },
   card: {
+    width: '100%',
     borderRadius: 10,
     padding: 10,
     backgroundColor: 'white',
-    marginTop: 10,
+    marginTop: 15,
+    flexDirection: 'row',
     shadowColor: '#7F5DF0',
     shadowOffset: { width: 0, height: 7 },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5,
   },
-  cardItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#748c94',
-    padding: 5,
+  cardBody: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    resizeMode: 'stretch',
+  },
+  titleForm: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 5,
+    marginBottom: 20,
   },
 });
 
-function Configuracion() {
+const initialState = {
+  idToUpdate: null,
+  medicinasList: [],
+  calendar: null,
+};
+
+const validationSchema = Yup.object({
+  desde: Yup.date().required('La fecha inicio es requerida'),
+  hasta: Yup.date().required('La fecha fin es requerida'),
+  periodisidad: Yup.number().required('La periodisidad es requerida'),
+  medicina: Yup.string().required('La medicina es requerida'),
+  cantidad: Yup.number().required('La cantidad de medicina es requerida'),
+});
+
+let initialValues = {
+  desde: new Date(),
+  hasta: new Date(),
+  periodisidad: '',
+  medicina: '',
+  cantidad: '',
+  observacion: '',
+};
+
+function CalendarioForm({
+  appError, navigation, doGet, doPost, appSuccess, appInfo, doPut,
+  route: { params: { id = null } = {} },
+}) {
+  const [state, setState] = useState(initialState);
+
+  const loadMedicina = async () => {
+    const url = `${endPoints.app.medicine.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
+    const resp = await doGet({ url });
+    const medicinasList = resp.map((row) => ({ value: row.id, label: row.name }));
+    setState((prevState) => ({ ...prevState, medicinasList }));
+  };
+
+  const findCalendar = async () => {
+    const url = `${endPoints.app.calendar.base}/${id}`;
+    const resp = await doGet({ url });
+    initialValues = {
+      desde: new Date(moment(resp.dateFrom)),
+      hasta: new Date(moment(resp.dateTo)),
+      periodisidad: resp.periodicity,
+      medicina: resp.medicine,
+      cantidad: resp.amount,
+      observacion: resp.observation,
+    };
+    setState((prevState) => ({ ...prevState, calendar: resp }));
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      try {
+        loadMedicina();
+        if (id) {
+          findCalendar();
+        }
+      } catch (error) {
+        appError(error.message ? error.message : messages.dataFetch.fail);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const createData = async (values) => {
+    try {
+      const url = endPoints.app.calendar.base;
+      const data = {
+        amount: values.cantidad,
+        dateFrom: moment(values.desde).format('YYYY-MM-DD HH:mm:ss'),
+        dateTo: moment(values.hasta).format('YYYY-MM-DD HH:mm:ss'),
+        medicine: values.medicina,
+        observation: values.observacion,
+        periodicity: values.periodisidad,
+        status: true,
+      };
+
+      if (id) {
+        data.id = id;
+
+        await doPut({ url, data });
+        appInfo(messages.crud.update);
+      } else {
+        data.userId = 'f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def';
+
+        await doPost({ url, data });
+        appSuccess(messages.crud.new);
+        navigation.goBack();
+      }
+    } catch (error) {
+      appError(error.message ? error.message : messages.crud.fail);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.topcard}>
-        <Icon name="cog" style={styles.titleIcon} />
-        <Text style={styles.title}>Configuraciones</Text>
-      </View>
-      <View style={{ ...StyleSheet.absoluteFillObject, ...styles.absotuleCard }} />
-      <View style={styles.cards}>
-        <View style={styles.card}>
-          <Text>Configuraciónes del usuario</Text>
-          <View style={styles.cardItem}>
-            <Icon name="cog" style={{ fontSize: 30 }} />
-            <Text style={{ fontSize: 16, marginLeft: 20 }}>Configuracion 1</Text>
-          </View>
-          <View style={styles.cardItem}>
-            <Icon name="cog" style={{ fontSize: 30 }} />
-            <Text style={{ fontSize: 16, marginLeft: 20 }}>Configuracion 2</Text>
-          </View>
-          <View style={styles.cardItem}>
-            <Icon name="cog" style={{ fontSize: 30 }} />
-            <Text style={{ fontSize: 16, marginLeft: 20 }}>Configuracion 3</Text>
-          </View>
-          <View style={styles.cardItem}>
-            <Icon name="cog" style={{ fontSize: 30 }} />
-            <Text style={{ fontSize: 16, marginLeft: 20 }}>Configuracion 4</Text>
-          </View>
-          <View style={styles.cardItem}>
-            <Icon name="cog" style={{ fontSize: 30 }} />
-            <Text style={{ fontSize: 16, marginLeft: 20 }}>Configuracion 5</Text>
-          </View>
-        </View>
-      </View>
-    </View>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      <TopCard title="Configuracion" iconName="calendar-alt" />
+      <Content style={{ paddingTop: 20 }}>
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={createData}
+        >
+          {({ handleSubmit }) => (
+            <View style={{ width: '100%' }}>
+              <Field
+                label="Responsable"
+                name="periodisidad"
+                keyboardType="numeric"
+                component={TextBase}
+                style={{ marginBottom: 10 }}
+              />
+
+              <Field
+                label="Altura"
+                name="cantidad"
+                keyboardType="numeric"
+                component={TextBase}
+                style={{ marginBottom: 10 }}
+              />
+              <Field
+                label="Peso"
+                name="cantidad"
+                keyboardType="numeric"
+                component={TextBase}
+                style={{ marginBottom: 10 }}
+              />
+              <Field
+                label="Enfermedades Base"
+                name="observacion"
+                component={TextBase}
+                style={{ marginBottom: 10 }}
+                multiline
+                numberOfLines={3}
+              />
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                width: '100%',
+                marginTop: 10,
+              }}
+              >
+                <Button
+                  type="warning"
+                  text="Cancelar"
+                  iconName="exclamation-triangle"
+                  style={{ width: '45%', borderRadius: 10 }}
+                  onPress={() => navigation.goBack()}
+                />
+                <Button
+                  text="Guardar"
+                  iconName="save"
+                  style={{ width: '45%', borderRadius: 10 }}
+                  onPress={handleSubmit}
+                />
+              </View>
+            </View>
+          )}
+        </Formik>
+      </Content>
+    </ScrollView>
   );
 }
 
-export default Configuracion;
+CalendarioForm.propTypes = {
+  navigation: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  route: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  appError: PropTypes.func.isRequired,
+  appInfo: PropTypes.func.isRequired,
+  doGet: PropTypes.func.isRequired,
+  doPost: PropTypes.func.isRequired,
+  appSuccess: PropTypes.func.isRequired,
+  doPut: PropTypes.func.isRequired,
+};
+
+export default withToast(withApi(CalendarioForm));

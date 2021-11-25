@@ -82,6 +82,14 @@ class ApiServiceFetch {
     return fetch(urlPath, optionsFetch);
   }
 
+  async patch({ url = null, bearer = true, data = {} }) {
+    const urlPath = await this.procesarUrl(url);
+    const optionsFetch = await this.configOptions(bearer, 'PATCH');
+    optionsFetch.body = JSON.stringify(data);
+
+    return fetch(urlPath, optionsFetch);
+  }
+
   async delete({ url = null, bearer = true, data = {} }) {
     const urlPath = await this.procesarUrl(url);
     const optionsFetch = await this.configOptions(bearer, 'DELETE');

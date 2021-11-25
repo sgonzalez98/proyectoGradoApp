@@ -12,6 +12,9 @@ export default (WrappedComponent) => class extends React.PureComponent {
       case 'put':
         initialResponse = await ApiServiceFetch.put(data);
         break;
+      case 'patch':
+        initialResponse = await ApiServiceFetch.patch(data);
+        break;
       case 'delete':
         initialResponse = await ApiServiceFetch.delete(data);
         break;
@@ -39,12 +42,15 @@ export default (WrappedComponent) => class extends React.PureComponent {
 
   doPut = async (data) => this.doRequest('put', data);
 
+  doPatch = async (data) => this.doRequest('patch', data);
+
   render() {
     return (
       <WrappedComponent
         doGet={this.doGet}
         doPost={this.doPost}
         doPut={this.doPut}
+        doPatch={this.doPatch}
         doDelete={this.doDelete}
         {...this.props}
       />

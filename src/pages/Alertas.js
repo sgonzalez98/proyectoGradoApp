@@ -45,7 +45,7 @@ const initialState = {
   data: [],
 };
 
-function Alertas({ doGet, appError }) {
+function Alertas({ doGet, appError, doPatch }) {
   const [state, setState] = useState(initialState);
   const setPrevState = (newState) => setState((prevState) => ({ ...prevState, ...newState }));
 
@@ -62,6 +62,26 @@ function Alertas({ doGet, appError }) {
       appError(error.message ? error.message : messages.dataFetch.fail);
     }
   }, []);
+
+  const completeAlert = async (id) => {
+    try {
+      const url = `${endPoints.app.register.complete}?registerId=${id}`;
+      await doPatch({ url });
+      loadData();
+    } catch (error) {
+      appError(error.message ? error.message : messages.crud.fail);
+    }
+  };
+
+  const postPoneAlert = async (id) => {
+    try {
+      const url = `${endPoints.app.register.complete}?registerId=${id}`;
+      await doPatch({ url });
+      loadData();
+    } catch (error) {
+      appError(error.message ? error.message : messages.crud.fail);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -80,13 +100,13 @@ function Alertas({ doGet, appError }) {
             <View style={styles.buttonsWrap}>
               <Button
                 text="Completar"
-                // onPress={() => openFormModal(row.id)}
+                onPress={() => completeAlert(row.id)}
                 style={{ marginRight: 5 }}
                 iconName="calendar-check"
               />
               <Button
                 text="Posponer"
-                // onPress={() => setState((prevState) => ({ ...prevState, idToDelete: row.id }))}
+                onPress={() => postPoneAlert(row.id)}
                 type="warning"
                 iconName="clock"
               />
@@ -101,6 +121,7 @@ function Alertas({ doGet, appError }) {
 Alertas.propTypes = {
   appError: PropTypes.func.isRequired,
   doGet: PropTypes.func.isRequired,
+  doPatch: PropTypes.func.isRequired,
 };
 
 export default withToast(withApi(Alertas));
