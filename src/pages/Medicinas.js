@@ -10,6 +10,7 @@ import { withApi, withToast } from 'providers';
 import * as Yup from 'yup';
 import { endPoints, messages } from 'constantes';
 import PropTypes from 'prop-types';
+import { StorageService } from 'services';
 
 const styles = StyleSheet.create({
   container: {
@@ -67,7 +68,8 @@ function Medicinas({
   const [state, setState] = useState(initialState);
 
   const loadData = async () => {
-    const url = `${endPoints.app.medicine.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
+    const userId = await StorageService.getValue('mediKitUsuarioId');
+    const url = `${endPoints.app.medicine.base}/user/${userId}`;
     const resp = await doGet({ url });
     setState((prevState) => ({ ...prevState, data: resp }));
   };
@@ -99,6 +101,7 @@ function Medicinas({
 
   const createData = async (values) => {
     try {
+      const userId = await StorageService.getValue('mediKitUsuarioId');
       const url = endPoints.app.medicine.base;
       const data = {
         name: values.nombre,
@@ -112,7 +115,7 @@ function Medicinas({
         appInfo(messages.crud.update);
       } else {
         data.picture = imageAdress;
-        data.userId = 'f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def';
+        data.userId = userId;
 
         await doPost({ url, data });
         appSuccess(messages.crud.new);

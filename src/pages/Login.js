@@ -6,7 +6,10 @@ import {
   Image, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
 import { TextBase, Button } from 'components';
-import { useNavigation } from '@react-navigation/native';
+import { withApi, withToast } from 'providers';
+import { endPoints, messages } from 'constantes';
+import PropTypes from 'prop-types';
+import { StorageService } from 'services';
 
 const iconImage = require('../../assets/icon.png');
 
@@ -47,8 +50,25 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Login() {
-  const navigation = useNavigation();
+function Login({
+  navigation, appError, doGet,
+}) {
+  const doLogin = async (values) => {
+    try {
+      const url = endPoints.app.user.login;
+      const data = {
+        password: values.password,
+        username: values.user,
+      };
+      const resp = await doGet({ url, data });
+      if (resp) {
+        StorageService.setValue('mediKitUsuarioId', resp.id);
+      }
+      navigation.navigate('Drawer');
+    } catch (error) {
+      appError('Credenciales invalidas');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -62,7 +82,7 @@ export default function Login() {
           <Formik
             initialValues={{ user: '', password: '' }}
             validationSchema={validationSchema}
-            onSubmit={() => navigation.navigate('Drawer')}
+            onSubmit={doLogin}
           >
             {({ handleSubmit, isSubmitting }) => (
               <View style={{ width: 0.9 * width }}>
@@ -84,7 +104,7 @@ export default function Login() {
                   iconName="sign-in-alt"
                   text="Iniciar Sesión"
                   onPress={handleSubmit}
-                  // disabled={isSubmitting}
+                  disabled={isSubmitting}
                   style={{ marginTop: 15 }}
                 />
               </View>
@@ -102,3 +122,11 @@ export default function Login() {
     </View>
   );
 }
+
+Login.propTypes = {
+  navigation: PropTypes.oneOfType([PropTypes.object]).isRequired,
+  appError: PropTypes.func.isRequired,
+  doGet: PropTypes.func.isRequired,
+};
+
+export default withToast(withApi(Login));

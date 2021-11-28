@@ -1,9 +1,4 @@
 export default {
-  auth: {
-    login: 'appauthenticate',
-    logout: 'logout',
-    token: 'token',
-  },
   app: {
     medicine: {
       base: 'medicine',
@@ -18,6 +13,7 @@ export default {
     },
     user: {
       base: 'user',
+      login: 'user/validate-credentials',
     },
   },
 };

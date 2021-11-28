@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { endPoints, messages } from 'constantes';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { StorageService } from 'services';
 
 const styles = StyleSheet.create({
   container: {
@@ -76,7 +77,8 @@ function CalendarioForm({
   const [state, setState] = useState(initialState);
 
   const loadMedicina = async () => {
-    const url = `${endPoints.app.medicine.base}/user/f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def`;
+    const userId = await StorageService.getValue('mediKitUsuarioId');
+    const url = `${endPoints.app.medicine.base}/user/${userId}`;
     const resp = await doGet({ url });
     const medicinasList = resp.map((row) => ({ value: row.id, label: row.name }));
     setState((prevState) => ({ ...prevState, medicinasList }));
@@ -113,6 +115,7 @@ function CalendarioForm({
 
   const createData = async (values) => {
     try {
+      const userId = await StorageService.getValue('mediKitUsuarioId');
       const url = endPoints.app.calendar.base;
       const data = {
         amount: values.cantidad,
@@ -130,7 +133,7 @@ function CalendarioForm({
         await doPut({ url, data });
         appInfo(messages.crud.update);
       } else {
-        data.userId = 'f2d5fd9d-0ea2-4ab0-8f3a-97443b4e8def';
+        data.userId = userId;
 
         await doPost({ url, data });
         appSuccess(messages.crud.new);
