@@ -73,6 +73,7 @@ function Alertas({ doGet, appError, doPatch }) {
     try {
       const url = `${endPoints.app.register.complete}?registerId=${id}`;
       await doPatch({ url });
+      await setPrevState({ idToComplete: null });
       loadData();
     } catch (error) {
       appError(error.message ? error.message : messages.crud.fail);
@@ -81,8 +82,9 @@ function Alertas({ doGet, appError, doPatch }) {
 
   const postPoneAlert = async (id) => {
     try {
-      const url = `${endPoints.app.register.complete}?registerId=${id}`;
+      const url = `${endPoints.app.register.postPone}?registerId=${id}`;
       await doPatch({ url });
+      await setPrevState({ idToPostpone: null });
       loadData();
     } catch (error) {
       appError(error.message ? error.message : messages.crud.fail);

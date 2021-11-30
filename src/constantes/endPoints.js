@@ -9,6 +9,7 @@ export default {
     register: {
       base: 'register',
       complete: 'register/complete',
+      postPone: 'register/postpone',
       pending: 'register/pending',
     },
     user: {
