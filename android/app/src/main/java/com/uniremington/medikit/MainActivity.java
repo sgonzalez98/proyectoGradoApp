@@ -1,4 +1,4 @@
-package com.medikit;
+package com.uniremington.medikit;
 
 import com.facebook.react.ReactActivity;
 

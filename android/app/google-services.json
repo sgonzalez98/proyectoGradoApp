@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "545983868321",
+    "project_id": "medikit-cce7a",
+    "storage_bucket": "medikit-cce7a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545983868321:android:43bb7727cb29bd0c79afe0",
+        "android_client_info": {
+          "package_name": "com.uniremington.medikit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545983868321-gl1n8qjkqflbqokuof0tf2uvh3r48bos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTu0YQgvS2G71wcrvRneB2B1owRHe0eIk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545983868321-gl1n8qjkqflbqokuof0tf2uvh3r48bos.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

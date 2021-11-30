@@ -27,6 +27,7 @@ function DatePickerComponent(props) {
     form: { touched, errors, setFieldValue },
     label,
     style,
+    disabled,
     ...otheProps
   } = props;
   const hasError = touched[name] && Boolean(errors[name]);
@@ -36,6 +37,7 @@ function DatePickerComponent(props) {
       <TouchableOpacity
         style={[styles.button, { borderColor }, style]}
         onPress={() => setShowModal(true)}
+        disabled={disabled}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Icon name="calendar" style={{ fontSize: 25, marginRight: 8 }} />
@@ -71,10 +73,12 @@ DatePickerComponent.propTypes = {
   field: PropTypes.oneOfType([PropTypes.object]).isRequired,
   form: PropTypes.oneOfType([PropTypes.object]).isRequired,
   style: PropTypes.oneOfType([PropTypes.object]),
+  disabled: PropTypes.bool,
 };
 
 DatePickerComponent.defaultProps = {
   style: {},
+  disabled: false,
 };
 
 export default DatePickerComponent;

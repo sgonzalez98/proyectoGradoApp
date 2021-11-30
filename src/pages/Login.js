@@ -1,13 +1,13 @@
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dimensions,
   Image, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
 import { TextBase, Button } from 'components';
 import { withApi, withToast } from 'providers';
-import { endPoints, messages } from 'constantes';
+import { endPoints } from 'constantes';
 import PropTypes from 'prop-types';
 import { StorageService } from 'services';
 
@@ -53,6 +53,21 @@ const styles = StyleSheet.create({
 function Login({
   navigation, appError, doGet,
 }) {
+  useEffect(async () => {
+    const unsubscribe = await navigation.addListener('focus', async () => {
+      try {
+        const user = await StorageService.getValue('mediKitUsuarioId');
+        if (user) {
+          navigation.navigate('Drawer');
+        }
+      } catch (error) {
+        appError(error.message || 'Error desconocido');
+      }
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
   const doLogin = async (values) => {
     try {
       const url = endPoints.app.user.login;
@@ -110,7 +125,6 @@ function Login({
               </View>
             )}
           </Formik>
-          {/* <div>Iconos diseñados por <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.es/" title="Flaticon">www.flaticon.es</a></div> */}
           <TouchableOpacity
             style={{ marginTop: 30 }}
             onPress={() => navigation.navigate('Register')}

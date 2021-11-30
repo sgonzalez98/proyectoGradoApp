@@ -113,7 +113,7 @@ function CalendarioForm({
     return unsubscribe;
   }, []);
 
-  const createData = async (values) => {
+  const createData = async (values, subProps) => {
     try {
       const userId = await StorageService.getValue('mediKitUsuarioId');
       const url = endPoints.app.calendar.base;
@@ -129,16 +129,15 @@ function CalendarioForm({
 
       if (id) {
         data.id = id;
-
         await doPut({ url, data });
         appInfo(messages.crud.update);
       } else {
         data.userId = userId;
-
         await doPost({ url, data });
         appSuccess(messages.crud.new);
-        navigation.goBack();
       }
+      subProps.resetForm();
+      navigation.goBack();
     } catch (error) {
       appError(error.message ? error.message : messages.crud.fail);
     }
@@ -154,13 +153,14 @@ function CalendarioForm({
           validationSchema={validationSchema}
           onSubmit={createData}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, resetForm }) => (
             <View style={{ width: '100%' }}>
               <Field
                 label="Fecha Inicio"
                 name="desde"
                 component={DatePicker}
                 style={{ marginBottom: 10 }}
+                disabled={!!id}
               />
               <Field
                 label="Fecha Fin"
@@ -209,7 +209,18 @@ function CalendarioForm({
                   text="Cancelar"
                   iconName="exclamation-triangle"
                   style={{ width: '45%', borderRadius: 10 }}
-                  onPress={() => navigation.goBack()}
+                  onPress={() => {
+                    initialValues = {
+                      desde: new Date(),
+                      hasta: new Date(),
+                      periodisidad: '',
+                      medicina: '',
+                      cantidad: '',
+                      observacion: '',
+                    };
+                    resetForm();
+                    navigation.goBack();
+                  }}
                 />
                 <Button
                   text="Guardar"

@@ -55,13 +55,13 @@ function TextBase({ getRef, ...props }) {
   const containerHeight = otheProps.multiline ? 70 : 40;
   return (
     <View style={style}>
+      <Text>{label}</Text>
       <TouchableOpacity style={[styles.container, { borderColor, height: containerHeight }]}>
         <TextInput
           name={name}
           onFocus={() => setFocused(true)}
           ref={ref}
           style={styles.input}
-          placeholder={label}
           onBlur={(event) => {
             setFocused(false);
             onBlur(name)(event);

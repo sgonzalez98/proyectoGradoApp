@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   ScrollView, StyleSheet, Text, View,
 } from 'react-native';
-import { TopCard, Content, Button } from 'components';
+import {
+  TopCard, Content, Button, ConfirmModal,
+} from 'components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import PropTypes from 'prop-types';
 import { endPoints, messages } from 'constantes';
@@ -44,6 +46,8 @@ const styles = StyleSheet.create({
 
 const initialState = {
   data: [],
+  idToComplete: null,
+  idToPostpone: null,
 };
 
 function Alertas({ doGet, appError, doPatch }) {
@@ -85,6 +89,7 @@ function Alertas({ doGet, appError, doPatch }) {
     }
   };
 
+  const { idToComplete, idToPostpone } = state;
   return (
     <ScrollView style={styles.container}>
       <TopCard title="Alertas Medicas" iconName="bell" />
@@ -102,19 +107,39 @@ function Alertas({ doGet, appError, doPatch }) {
             <View style={styles.buttonsWrap}>
               <Button
                 text="Completar"
-                onPress={() => completeAlert(row.id)}
+                onPress={() => setPrevState({ idToComplete: row.id })}
                 style={{ marginRight: 5 }}
                 iconName="calendar-check"
               />
               <Button
                 text="Posponer"
-                onPress={() => postPoneAlert(row.id)}
+                onPress={() => setPrevState({ idToPostpone: row.id })}
                 type="warning"
                 iconName="clock"
               />
             </View>
           </View>
         ))}
+        {Boolean(idToComplete) && (
+          <ConfirmModal
+            title="Completar alerta de tratamiento"
+            description="¿Esta seguro de completar este tratamiento?"
+            labelAccept="Completar"
+            labelCancel="Cancelar"
+            onAccept={() => completeAlert(idToComplete)}
+            onCancel={() => setPrevState({ idToComplete: null })}
+          />
+        )}
+        {Boolean(idToPostpone) && (
+          <ConfirmModal
+            title="Posponer alerta de tratamiento"
+            description="¿Esta seguro de posponer este tratamiento, este se recordara nuevamente en 10 min?"
+            labelAccept="Posponer"
+            labelCancel="Cancelar"
+            onAccept={() => postPoneAlert(idToPostpone)}
+            onCancel={() => setPrevState({ idToPostpone: null })}
+          />
+        )}
       </Content>
     </ScrollView>
   );

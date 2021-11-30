@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.medikit">
+  package="com.uniremington.medikit">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
